@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Openverse Dashboard</title>
+    
+    <!-- Bootstrap 4 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .navbar {
+            background-color: #343a40;
+        }
+
+        .navbar-brand {
+            color: #ffffff;
+        }
+
+        .navbar-nav .nav-link {
+            color: #ffffff;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #adb5bd;
+        }
+
+        .search-bar {
+            margin-top: 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .search-bar input {
+            width: 80%;
+            padding: 12px 15px;
+            border-radius: 25px;
+            border: 1px solid #ced4da;
+            font-size: 16px;
+        }
+
+        .search-bar button {
+            border: none;
+            background-color: transparent;
+            position: absolute;
+            right: 20px;
+            font-size: 18px;
+            color: #6c757d;
+        }
+
+        .card-img-top {
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .card {
+            transition: transform 0.3s ease-in-out;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            cursor: pointer;
+        }
+
+        .saved-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .image-card img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .footer-links a {
+            color: #007bff;
+            margin: 0 10px;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="/">Openverse Search</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Search Section -->
+    <div class="search-bar">
+        <form method="POST" class="w-75">
+            {{ form.hidden_tag() }}
+            <div class="input-group">
+                {{ form.query(class="form-control") }}
+                <button type="submit" class="btn"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Search Results Section -->
+    <div class="container">
+        <h2 class="text-center mb-4">Search Results</h2>
+        <div class="row">
+            {% for image in images %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <img src="{{ image['preview_url'] }}" class="card-img-top" alt="{{ image['title'] }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ image['title'] }}</h5>
+                            <p class="card-text">By: {{ image['author'] }}</p>
+                            <p class="card-text">License: {{ image['license'] }}</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{{ url_for('save_image', image_url=image['url'], title=image['title'], author=image['author'], license=image['license'], preview_url=image['preview_url']) }}" class="btn btn-primary btn-sm">Save</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center col-12">No results found.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Saved Images Section -->
+        <h2 class="text-center mb-4">Your Saved Images</h2>
+        <div class="saved-images">
+            {% for saved_image in saved_images %}
+                <div class="card image-card shadow-sm">
+                    <img src="{{ saved_image[6] }}" class="card-img-top" alt="{{ saved_image[2] }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ saved_image[2] }}</h5>
+                    </div>
+                    <div class="card-footer footer-links text-center">
+                        <a href="{{ url_for('delete_image', image_id=saved_image[0]) }}" class="btn btn-danger btn-sm">Delete</a>
+                        <a href="{{ url_for('download_image', image_url=saved_image[1]) }}" class="btn btn-success btn-sm">Download</a>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center col-12">No saved images.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Bootstrap and FontAwesome Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>
